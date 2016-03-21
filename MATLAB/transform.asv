@@ -1,0 +1,87 @@
+[x,Fs] = wavread('HS_PE1_MO_M_21_2_2');
+T=1/Fs;
+L=length(x);
+t=(0:L-1)*T;
+y=x;
+figure(1)
+subplot(2,1,1)
+plot(t,x)
+title('Señal LS Normal en el dominio del tiempo');
+xlabel('Tiempo en segundos');
+ylabel('magnitud')
+nfft=2^nextpow2(L);
+Y=abs(fft(y,nfft))/L;
+f=(Fs/2)*linspace(0,1,nfft/2+1);
+%figure(2)
+subplot(2,1,2)
+plot(f,Y(1:nfft/2+1));
+title('Señal LS en el domino de la frecuencia');
+xlabel('Frecuencia en Hz')
+ylabel('Magnitud en Y(f)')
+
+figure(2)
+spectrogram(y,512,256,512,Fs,'yaxis')
+title('Transformada de la señal STFT');
+xlabel('Tiempo en segundos');
+ylabel('Frecuencia en Hz');
+
+%Visto en clase del 21 de Octubre:
+%FILTRADO PASABAJA
+% % valor de frecuencia que me interesa entre frecuencia de muestreo
+% wp = 250/Fs; %frecuencia pasabanda
+% % valor de frecuencia que me quisiera suprimir
+% ws = 300/Fs; %frecuencia de corte 
+% rp = 3;
+% rs = 15; %atenuación
+% %[N,Wn] = buttord(wp,ws,rp,rs);% orden y tambien el ... ajustado
+% %[B,A] = butter(N,Wn);
+% [N,Wn] = ellipord(wp,ws,rp,rs);% orden y tambien el ... ajustado
+% [B,A] = ellip(N,Wn);
+% z = filter(B,A,x);%convulcion
+
+
+
+%FILTRADO PASAALTA
+%valor de frecuencia que me interesa entre frecuencia de muestreo
+wp = 300/Fs; %frecuencia pasabanda
+%valor de frecuencia que me quisiera suprimir
+ws = 200/Fs; %frecuencia de corte 
+rp = 3;
+rs = 15; %atenuación
+[N,Wn] = buttord(wp,ws,rp,rs);% orden y tambien el ... ajustado
+[B,A] = butter(N,Wn,'high');
+%[N,Wn] = ellipord(wp,ws,rp,rs);% orden y tambien el ... ajustado
+%[B,A] = ellip(N,Wn);
+z = filter(B,A,x);%convulcion
+
+
+
+A=[1];
+N 
+B=fir1(150,wp,'high');
+
+%GRAFICADO
+figure(3)
+subplot(2,1,1)
+plot(t,z)
+title('Señal LS-Filtrada en el domino del tiempo');
+xlabel('Tiempo en segundos')
+ylabel('magnitud')
+nfft=2^nextpow2(L);
+Z=abs(fft(z,nfft))/L;
+subplot(2,1,2)
+plot(f,Z(1:nfft/2+1));
+title('Señal LS-Filtrada en el domino de la frecuencia');
+xlabel('Frecuencia en Hz')
+ylabel('Magnitud en Y(f)')
+
+
+figure(4)
+spectrogram(z,512,256,512,Fs,'yaxis')
+title('Transformada de la señal STFT');
+xlabel('Tiempo en segundos');
+ylabel('Frecuencia en Hz');
+
+
+% wavwrite(z,Fs,16,'HSFiltrada');
+
